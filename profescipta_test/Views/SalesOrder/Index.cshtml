@@ -1,0 +1,173 @@
+﻿@{
+    ViewData["Title"] = "Home Page";
+    @model IEnumerable<profescipta_test.Models.SalesOrderModel>
+    var currentPage = (int)ViewData["CurrentPage"];
+    var totalPages = (int)ViewData["TotalPages"];
+    int index = (int)ViewData["Index"];
+
+}
+
+<!-- Display Success Modal if TempData contains success message -->
+@if (TempData["SuccessMessage"] != null)
+{
+    <div class="modal fade" id="successModal" tabindex="-1" aria-labelledby="successModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="successModalLabel">Success</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    @TempData["SuccessMessage"]
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>// Automatically show the modal when the page loads if there's a success message
+        $(document).ready(function () {
+            $('#successModal').modal('show');
+        });</script>
+}
+
+<div>
+
+    <form method="get">
+        <div class="row">
+            <div class="col">
+                <label for="salesOrderFilter">Keyword:</label>
+                <input type="text" id="keyword" name="keyword" value="@ViewData["Keyword"]" class="form-control" />
+            </div>
+            <div class="col">
+                <label for="orderDateFilter">Order Date:</label>
+                <input type="date" id="orderDateFilter" name="orderDateFilter" value="@ViewData["OrderDateFilter"]" class="form-control" />
+            </div>
+            <div class="col">
+                <button type="submit" class="btn btn-primary" style="margin-top: 25px;">Search</button>
+            </div>
+        </div>
+    </form>
+    <a href="@Url.Action("Create")" class="btn btn-success">Add New Data</a>
+    <a href="@Url.Action("Export",new { keyword = ViewData["Keyword"],orderDateFilter = ViewData["orderDateFilter"] })" class="btn btn-success">Export to excel</a>
+
+    <table class="table" id="salesOrderTable">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Action</th>
+                <th>Sales Order</th>
+                <th>Order Date</th>
+                <th>Customer</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>@index</td>
+                    <td>
+                        <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-warning">Edit</a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id">
+                            Delete
+                        </button>
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this sales order?
+                                    </div>
+                                    <div class="modal-footer">
+
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <a href="@Url.Action("DeleteConfirmed", new { id = item.Id })" class="btn btn-danger">Delete</a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>@item.SalesOrder</td>
+                    <td>@item.OrderDate.ToString("yyyy-MM-dd")</td>
+                    <td>@item.Customer</td>
+                </tr>
+                index++;
+            }
+        </tbody>
+    </table>
+
+
+    <div>
+
+        <ul class="pagination">
+            @if (ViewData["CurrentPage"] != null && ViewData["TotalPages"] != null)
+            {
+
+                if (currentPage > 1)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { page = currentPage - 1,keyword = ViewData["Keyword"],orderDateFilter = ViewData["orderDateFilter"] })">Previous</a>
+                    </li>
+                }
+
+                for (int i = 1; i <= totalPages; i++)
+                {
+                    <li class="page-item @(i == currentPage ? "active" : "")">
+                        <a class="page-link" href="@Url.Action("Index", new { page = i,keyword = ViewData["Keyword"],orderDateFilter = ViewData["orderDateFilter"] })">@i</a>
+                    </li>
+                }
+
+                if (currentPage < totalPages)
+                {
+                    <li class="page-item">
+                        <a class="page-link" href="@Url.Action("Index", new { page = currentPage + 1,keyword = ViewData["Keyword"],orderDateFilter = ViewData["orderDateFilter"] })">Next</a>
+                    </li>
+                }
+            }
+            <li class="page-item">  @ViewData["StartRecord"] - @ViewData["EndRecord"] of @ViewData["TotalRecords"] items</li>
+
+        </ul>
+    </div>
+
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this sales order?
+            </div>
+            <div class="modal-footer">
+                <!-- Delete Form -->
+                <form method="post" action="@Url.Action("Delete", "SalesOrder")">
+                    @Html.AntiForgeryToken()
+                    <input type="hidden" id="orderIdToDelete" name="id" />
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-danger">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>// Pass the Sales Order ID to the modal form
+    $('#deleteModal').on('show.bs.modal', function (event) {
+        var button = $(event.relatedTarget); // Button that triggered the modal
+        var orderId = button.data('id'); // Extract the order ID from data-id attribute
+
+        var modal = $(this);
+        modal.find('#orderIdToDelete').val(orderId); // Set the order ID in the hidden input field
+    });</script>
+

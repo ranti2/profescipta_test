@@ -1,0 +1,23 @@
+﻿@model SalesOrderModel
+
+@{
+    ViewData["Title"] = "Edit Sales Order";
+}
+
+<h1>@ViewData["Title"]</h1>
+
+<form method="post">
+    <div class="form-group">
+        <label for="SalesOrder">Sales Order</label>
+        <input type="text" class="form-control" id="SalesOrder" name="SalesOrder" value="@Model.SalesOrder" required />
+    </div>
+    <div class="form-group">
+        <label for="OrderDate">Order Date</label>
+        <input type="date" class="form-control" id="OrderDate" name="OrderDate" value="@Model.OrderDate.ToString("yyyy-MM-dd")" required />
+    </div>
+    <div class="form-group">
+        <label for="Customer">Customer</label>
+        <input type="text" class="form-control" id="Customer" name="Customer" value="@Model.Customer" required />
+    </div>
+    <button type="submit" class="btn btn-primary">Update</button>
+</form>

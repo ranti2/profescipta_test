@@ -1,0 +1,44 @@
+﻿<Properties StartupConfiguration="{0DB396C7-2CD8-4A9C-8B15-E99A188B06E3}|https">
+  <MonoDevelop.Ide.ItemProperties.profescipta__test PreferredExecutionTarget="/Applications/Google Chrome.app" />
+  <MonoDevelop.Ide.Workspace ActiveConfiguration="Debug" />
+  <MonoDevelop.Ide.DebuggingService.Breakpoints>
+    <BreakpointStore />
+  </MonoDevelop.Ide.DebuggingService.Breakpoints>
+  <MonoDevelop.Ide.Workbench ActiveDocument="profescipta_test/Views/SalesOrder/Create.cshtml">
+    <Files>
+      <File FileName="profescipta_test/Controllers/SalesOrderController.cs" />
+      <File FileName="profescipta_test/Views/SalesOrder/Index.cshtml" />
+      <File FileName="profescipta_test/Repository/SalesOrderRepo.cs" />
+      <File FileName="profescipta_test/Views/SalesOrder/Create.cshtml" Line="119" Column="37" />
+      <File FileName="profescipta_test/wwwroot/js/site.js" />
+      <File FileName="profescipta_test/Views/SalesOrder/Edit.cshtml" />
+      <File FileName="profescipta_test/Views/Home/Index.cshtml" />
+      <File FileName="profescipta_test/Models/SalesOrderModel.cs" />
+    </Files>
+    <Pads>
+      <Pad Id="ProjectPad">
+        <State name="__root__">
+          <Node name="profescipta_test" expanded="True">
+            <Node name="profescipta_test" expanded="True">
+              <Node name="Controllers" expanded="True" />
+              <Node name="Models" expanded="True" />
+              <Node name="Repository" expanded="True" />
+              <Node name="Views" expanded="True">
+                <Node name="Home" expanded="True" />
+                <Node name="SalesOrder" expanded="True">
+                  <Node name="Create.cshtml" selected="True" />
+                </Node>
+                <Node name="Shared" expanded="True" />
+              </Node>
+              <Node name="wwwroot" expanded="True">
+                <Node name="js" expanded="True" />
+              </Node>
+            </Node>
+          </Node>
+        </State>
+      </Pad>
+    </Pads>
+  </MonoDevelop.Ide.Workbench>
+  <MultiItemStartupConfigurations />
+  <MonoDevelop.Ide.DebuggingService.PinnedWatches />
+</Properties>

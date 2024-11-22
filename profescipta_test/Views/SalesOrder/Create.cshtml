@@ -1,0 +1,145 @@
+﻿@model SalesOrderDetail
+
+@{
+    ViewData["Title"] = "Create Sales Order";
+    int index = 1;
+}
+
+<h2>@ViewData["Title"]</h2>
+
+<form method="post">
+    <div class="form-group">
+        <label for="SalesOrder">Sales Order</label>
+        <input type="text" class="form-control" id="SalesOrder" name="SalesOrder" value="@Model.SalesOrder.SalesOrder" required />
+    </div>
+    <div class="form-group">
+        <label for="OrderDate">Order Date</label>
+        <input type="date" class="form-control" id="OrderDate" name="OrderDate" value="@Model.SalesOrder.OrderDate.ToString("yyyy-MM-dd")" required />
+    </div>
+    <div class="form-group">
+        <label for="Customer">Customer</label>
+        <input type="text" class="form-control" id="Customer" name="Customer" value="@Model.SalesOrder.Customer" required />
+    </div>
+
+    <button type="button" class="btn btn-primary" id="addRowButton">Add item</button>
+
+    <table class="table" id="salesOrderTable">
+        <thead>
+            <tr>
+                <th>No</th>
+                <th>Action</th>
+                <th>Sales Order</th>
+                <th>Order Date</th>
+                <th>Customer</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Order)
+            {
+                <tr>
+                    <td>@index</td>
+                    <td>
+                        <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-warning">Edit</a>
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id">
+                            Delete
+                        </button>
+                        <!-- Delete Confirmation Modal -->
+                        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure you want to delete this sales order?
+                                    </div>
+                                    <div class="modal-footer">
+
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                        <a href="@Url.Action("DeleteConfirmed", new { id = item.Id })" class="btn btn-danger">Delete</a>
+
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </td>
+                    <td>@item.Name</td>
+                    <td>@item.Qty</td>
+                    <td>@item.Price</td>
+                    <td>@item.Total</td>
+                </tr>
+                index++;
+            }
+        </tbody>
+    </table>
+    <button type="submit" class="btn btn-primary">Save</button>
+</form>
+
+<script>
+
+
+    function renderTable() {
+        const tbody = $('#salesOrderTable tbody');
+        tbody.empty();
+        @{ }
+        const row = `
+            <tr>
+                <td><input type="text" class="form-control" value="${item.ItemName}" data-index="${item.Id}" data-field="ItemName" onchange="updateItemData(this)" /></td>
+                <td><input type="number" class="form-control" value="${item.Quantity}" data-index="${item.Id}" data-field="Quantity" onchange="updateItemData(this)" /></td>
+                <td><input type="number" class="form-control" value="${item.Price}" data-index="${item.Id}" data-field="Price" onchange="updateItemData(this)" /></td>
+                <td>
+                    <button type="button" class="btn btn-danger" onclick="deleteRow(${item.Id})">Delete</button>
+                </td>
+            </tr>
+        `;
+        tbody.append(row);
+
+    }
+
+    function saveItem() {
+        console.log("item saved");
+    }
+
+
+    $('#addRowButton').click(function () {
+        console.log("aaa");
+
+        // append row
+        const tbody = $('#salesOrderTable tbody');
+        @{ }
+        const row = `
+            <tr>
+                <td>1</td>
+                <td>
+                    <button type="button" class="btn btn-danger" onclick="saveItem()">Save</button>
+                </td>
+                <td><input type="text" class="form-control" value="" data-index="" data-field="ItemName" /></td>
+                <td><input type="number" class="form-control" value="" data-index="" data-field="Quantity" /></td>
+                <td><input type="number" class="form-control" value="" data-index="" data-field="Price" /></td>
+                <td>Total</td>
+            </tr>
+        `;
+        tbody.append(row);
+
+        @{
+            Model.Order.Add(
+                    new OrderItemModel
+                    {
+                        Name = "",
+                        Qty = 0,
+                        Price = 0,
+                        Total = 0
+
+                    }
+           ) ;
+
+
+
+        }
+
+    });
+
+</script>
+
+
