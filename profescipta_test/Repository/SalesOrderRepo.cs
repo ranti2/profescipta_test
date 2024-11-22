@@ -19,16 +19,21 @@ namespace profescipta_test.Repository
         // Create Operation
         public async Task<int> AddSalesOrderAsync(SalesOrderModel salesOrder)
         {
-            var query = "INSERT INTO [order] (sales_order, order_date, customer) VALUES (@SalesOrder, @OrderDate, @Customer);";
+            Console.WriteLine(salesOrder.SalesOrder);
+            var query = "INSERT INTO [order] (sales_order, order_date, customer,address) VALUES (@SalesOrder, @OrderDate, @Customer,@Address); SELECT CAST(SCOPE_IDENTITY() AS INT);";
             using var connection = new SqlConnection(_connectionString);
             using var command = new SqlCommand(query, connection);
 
             command.Parameters.AddWithValue("@SalesOrder", salesOrder.SalesOrder);
             command.Parameters.AddWithValue("@OrderDate", salesOrder.OrderDate);
             command.Parameters.AddWithValue("@Customer", salesOrder.Customer);
+            command.Parameters.AddWithValue("@Address", salesOrder.Address);
 
             connection.Open();
-            return (int)command.ExecuteScalar();
+            var id = command.ExecuteScalar();
+            Console.WriteLine(id);
+            return (int)id;
+            
 
         }
         public async Task<List<SalesOrderModel>> GetPagedSalesOrdersAsync(int page, int pageSize, string keyword, string orderDateFilter)
@@ -289,7 +294,7 @@ namespace profescipta_test.Repository
             return orderItems;
         }
 
-        public void BulkInsertOrderItem(List<OrderItemModel> data)
+        public void BulkInsertOrderItem(int salesId,List<OrderItemModel> data)
         {
             using (var connection = new SqlConnection(_connectionString))
             {
@@ -303,7 +308,7 @@ namespace profescipta_test.Repository
                 for (int i = 0; i < data.Count; i++)
                 {
                     var item = data[i];
-                    sqlBuilder.Append($"('{item.SalesOrderId}', {item.Name}, '{item.Qty}','{item.Price}','{item.Total}')");
+                    sqlBuilder.Append($"('{salesId}', '{item.Name}', '{item.Qty}','{item.Price}','{item.Total}')");
 
                     // Add a comma if not the last row
                     if (i < data.Count - 1)

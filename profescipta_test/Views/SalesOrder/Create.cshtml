@@ -1,8 +1,10 @@
 ﻿@model SalesOrderDetail
 
+
 @{
     ViewData["Title"] = "Create Sales Order";
     int index = 1;
+    var order = new OrderItemModel();
 }
 
 <h2>@ViewData["Title"]</h2>
@@ -20,125 +22,133 @@
         <label for="Customer">Customer</label>
         <input type="text" class="form-control" id="Customer" name="Customer" value="@Model.SalesOrder.Customer" required />
     </div>
+    <div class="form-group">
+        <label for="Address">Address</label>
+        <textarea class="form-control" id="Address" name="Address" value="@Model.SalesOrder.Address" required ></textarea>
+    </div>
 
     <button type="button" class="btn btn-primary" id="addRowButton">Add item</button>
 
-    <table class="table" id="salesOrderTable">
+    <table class="table table-bordered" id="salesOrderTable">
         <thead>
             <tr>
                 <th>No</th>
                 <th>Action</th>
-                <th>Sales Order</th>
-                <th>Order Date</th>
-                <th>Customer</th>
+                <th>Item Name</th>
+                <th>QTY</th>
+                <th>Price</th>
+                <th>Total</th>
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Order)
-            {
-                <tr>
-                    <td>@index</td>
-                    <td>
-                        <a href="@Url.Action("Edit", new { id = item.Id })" class="btn btn-warning">Edit</a>
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#deleteModal" data-id="@item.Id">
-                            Delete
-                        </button>
-                        <!-- Delete Confirmation Modal -->
-                        <div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="deleteModalLabel">Confirm Deletion</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        Are you sure you want to delete this sales order?
-                                    </div>
-                                    <div class="modal-footer">
-
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                        <a href="@Url.Action("DeleteConfirmed", new { id = item.Id })" class="btn btn-danger">Delete</a>
-
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </td>
-                    <td>@item.Name</td>
-                    <td>@item.Qty</td>
-                    <td>@item.Price</td>
-                    <td>@item.Total</td>
-                </tr>
-                index++;
-            }
         </tbody>
     </table>
-    <button type="submit" class="btn btn-primary">Save</button>
+    <button type="button" class="btn btn-primary" id="save-all">Save</button>
 </form>
 
 <script>
 
+    $(document).ready(function () {
+       
+        $('#addRowButton').click(function () {
 
-    function renderTable() {
-        const tbody = $('#salesOrderTable tbody');
-        tbody.empty();
-        @{ }
-        const row = `
-            <tr>
-                <td><input type="text" class="form-control" value="${item.ItemName}" data-index="${item.Id}" data-field="ItemName" onchange="updateItemData(this)" /></td>
-                <td><input type="number" class="form-control" value="${item.Quantity}" data-index="${item.Id}" data-field="Quantity" onchange="updateItemData(this)" /></td>
-                <td><input type="number" class="form-control" value="${item.Price}" data-index="${item.Id}" data-field="Price" onchange="updateItemData(this)" /></td>
-                <td>
-                    <button type="button" class="btn btn-danger" onclick="deleteRow(${item.Id})">Delete</button>
-                </td>
-            </tr>
-        `;
-        tbody.append(row);
+            const newRow = `
+                <tr>
+                    <td></td>
+                    <td>
+                        <button class="btn btn-sm btn-success save-row">Save</button>
+                        <button class="btn btn-sm btn-danger remove-row">Remove</button>
+                    </td>
+                    </td>
+                    <td><input type="text" class="form-control name" placeholder="Name"></td>
+                    <td><input type="number" class="form-control qty" min="0" placeholder="0"></td>
+                    <td><input type="number" class="form-control price" min="0" placeholder="0"></td>
+                    <td><input type="number" class="form-control total" readonly></td>
+                </tr>`;
+            $('#salesOrderTable tbody').prepend(newRow);
 
-    }
+        });
+        $(document).on('input', '.qty, .price', function () {
+            const row = $(this).closest('tr');
+            const qty = parseInt(row.find('.qty').val()) || 0;
+            const price = parseInt(row.find('.price').val()) || 0;
+            const total = qty * price;
 
-    function saveItem() {
-        console.log("item saved");
-    }
+            row.find('.total').val(parseInt(total));
+     
+        });
 
+        $(document).on('click', '.remove-row', function () {
+            const row = $(this).closest('tr');
+            row.remove();
+        });
 
-    $('#addRowButton').click(function () {
-        console.log("aaa");
+        $(document).on('click', '.save-row', function () {
+            const row = $(this).closest('tr');
+            const name = row.find('.name').val();
+            const qty = parseInt(row.find('.qty').val()) || 0;
+            const price = parseInt(row.find('.price').val()) || 0;
+            const total = parseInt(row.find('.total').val()) || 0;
 
-        // append row
-        const tbody = $('#salesOrderTable tbody');
-        @{ }
-        const row = `
-            <tr>
-                <td>1</td>
-                <td>
-                    <button type="button" class="btn btn-danger" onclick="saveItem()">Save</button>
-                </td>
-                <td><input type="text" class="form-control" value="" data-index="" data-field="ItemName" /></td>
-                <td><input type="number" class="form-control" value="" data-index="" data-field="Quantity" /></td>
-                <td><input type="number" class="form-control" value="" data-index="" data-field="Price" /></td>
-                <td>Total</td>
-            </tr>
-        `;
-        tbody.append(row);
+            // Validate input
+            if (!name || qty <= 0 || price <= 0) {
+                alert('Please fill out all fields correctly.');
+                return;
+            }
 
-        @{
-            Model.Order.Add(
-                    new OrderItemModel
-                    {
-                        Name = "",
-                        Qty = 0,
-                        Price = 0,
-                        Total = 0
+            row.find('input').attr('readonly', true);
+            $(this).remove();
+        });
 
-                    }
-           ) ;
+        $('#save-all').click(function () {
+            const tempData = [];
 
+            $('#salesOrderTable tbody').find('tr').each(function () {
+                const row = $(this);
+                const data = {};
+                const name = row.find('.name').val();
+                const qty = parseInt(row.find('.qty').val()) || 0;
+                const price = parseInt(row.find('.price').val()) || 0;
+                const total = parseInt(row.find('.total').val()) || 0;
+                data.Name = name;
+                data.Qty = qty;
+                data.Price = price;
+                data.Total = total;
+                tempData.push(data);
 
+            });
+            
+            salesOrderData = {};
+            salesOrderData.SalesOrder = $("#SalesOrder").val();
+            salesOrderData.OrderDate = $("#OrderDate").val();
+            salesOrderData.Customer = $("#Customer").val();
+            salesOrderData.Address = $("#Address").val();
 
-        }
+            salesOrderDetail = {};
+            salesOrderDetail.SalesOrder = salesOrderData;
+            salesOrderDetail.Order = tempData;
+            console.log(salesOrderDetail);
+
+            // Save data via AJAX
+            $.ajax({
+                url: '/SalesOrder/Create',
+                type: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(salesOrderDetail),
+                success: function () {
+                    alert('Sales Order Saved successfully!');
+                },
+                error: function (xhr, status, error) {
+                    console.log('Error details:', xhr, status, error); 
+                    alert(error);
+                }
+            });
+        });
 
     });
+ 
+
+    
 
 </script>
 

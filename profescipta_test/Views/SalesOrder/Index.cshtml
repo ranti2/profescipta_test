@@ -162,12 +162,12 @@
     </div>
 </div>
 
-<script>// Pass the Sales Order ID to the modal form
+<script>
     $('#deleteModal').on('show.bs.modal', function (event) {
-        var button = $(event.relatedTarget); // Button that triggered the modal
-        var orderId = button.data('id'); // Extract the order ID from data-id attribute
+        var button = $(event.relatedTarget); 
+        var orderId = button.data('id'); 
 
         var modal = $(this);
-        modal.find('#orderIdToDelete').val(orderId); // Set the order ID in the hidden input field
+        modal.find('#orderIdToDelete').val(orderId); 
     });</script>
 

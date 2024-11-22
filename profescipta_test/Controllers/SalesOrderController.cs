@@ -68,30 +68,22 @@ public class SalesOrderController : Controller
 
     // POST: /SalesOrder/Create
     [HttpPost]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Create(SalesOrderDetail model)
+    public async Task<IActionResult> Create([FromBody] SalesOrderDetail model)
     {
-        if (ModelState.IsValid)
+        var salesOrder = await salesOrderRepo.GetSalesOrderByOrdersAsync(model.SalesOrder.SalesOrder);
+        if (salesOrder == null) {
+
+            int salesOrderId = await salesOrderRepo.AddSalesOrderAsync(model.SalesOrder);
+            salesOrderRepo.BulkInsertOrderItem(salesOrderId, model.Order);
+
+        }
+        else
         {
-   
-            var salesOrder = await salesOrderRepo.GetSalesOrderByOrdersAsync(model.SalesOrder.SalesOrder);
-            if (salesOrder == null) {
-
-               await salesOrderRepo.AddSalesOrderAsync(model.SalesOrder);
-               salesOrderRepo.BulkInsertOrderItem(model.Order);
-
-            }
-            else
-            {
-                TempData["SuccessMessage"] = "Sales Order Alredy Exist!";
-                return RedirectToAction("Index");
-            }
-
-            TempData["SuccessMessage"] = "Sales Order created successfully!";
-            return RedirectToAction("Index");
+            return BadRequest("Already Exist");
         }
 
-        return View(model);
+        return Ok();
+        
     }
 
     // GET: /SalesOrder/Edit/{id}
